@@ -4,6 +4,16 @@ const http = require('http');   // require abil saab koodi lisada ka enda teisi 
 // Olek (state) või andmebaas
 let fruits = ["apple","pear","banana","bamboo","ananass","arbuus"]
 
+function addFruit(name) {
+    fruits.push(name)
+}
+
+function removeFruit(name) {
+    let position = fruits.indexOf(name)
+    if (position !== -1)
+        fruits.splice(position, 1)
+}
+
 /**
  * See funktsioon käivitub iga kord kui keegi kodulehte külastab
  * @param {*} req Request sees on kirjeldatud kasutaja soove
@@ -13,6 +23,17 @@ function requestListener(req, res) {
     console.log(req.url) // Prindib käsurea aknasse mis aadressi kasutaja brauseris avas
     let otsingusõna = ""
     let filterResults
+
+    // Kas aadressi peal on kirjas käsklus lisada uus kanne
+    if (req.url.includes("lisa")) {
+        let nimiMidaLisada = req.url.split("=")[1]
+        addFruit(nimiMidaLisada)
+    }
+
+    // Kas aadressi peal on kirjas kustutamise käsklus
+    if (req.url.includes("kustuta")) {
+        removeFruit( req.url.split("=")[1] )
+    }
 
     // Kui meil on aadressi peal otsing siis proovime otsingusõna aadressist eraldada
     if (req.url.includes("otsi"))
@@ -29,6 +50,8 @@ function requestListener(req, res) {
     // Paneme kokku HTML vastuse
     let html = "<html><head><title>Test</title></head><body>"
     html += "<form><input name='otsi' /><button>Filtreeri</button></form>"
+    html += "<form><input name='lisa' /><button>Lisa uus</button></form>"
+    html += "<form><input name='kustuta' /><button>Kustuta</button></form>"
     filterResults.forEach(fruit => html += fruit+"<br>")
     /*
     for (let i=0; i<fruits.length; i++) {
